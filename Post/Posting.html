@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post estilo Reddit</title>
+
+<style>
+/* =====================
+   ESTILO GENERAL
+===================== */
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #0b0b0b;
+  color: #fff;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* =====================
+   HEADER / BANNER
+===================== */
+.banner {
+  width: 100%;
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 3px solid #d8175f;
+}
+
+/* =====================
+   LAYOUT PRINCIPAL
+===================== */
+.main {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* =====================
+   DESCRIPCIÓN
+===================== */
+.descripcion {
+  background: #111;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.descripcion h2 {
+  color: #d8175f;
+  margin-top: 0;
+}
+
+/* =====================
+   SIDEBAR
+===================== */
+.sidebar {
+  background: #111;
+  padding: 15px;
+  border-radius: 10px;
+  height: fit-content;
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  color: #00ff99;
+}
+
+.sidebar textarea {
+  width: 100%;
+  min-height: 200px;
+  background: #0b0b0b;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 10px;
+  resize: vertical;
+}
+
+/* =====================
+   POST / CARD
+===================== */
+.post {
+  background: #111;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.post h3 {
+  margin-top: 0;
+  color: #d8175f;
+}
+
+.post p {
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* =====================
+   IMÁGENES
+===================== */
+.post-images img {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 15px;
+  border-radius: 10px;
+}
+
+/* =====================
+   RESPONSIVE
+===================== */
+@media (max-width: 900px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- BANNER -->
+<div class="banner" id="banner"></div>
+
+<div class="main">
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div>
+
+    <!-- DESCRIPCIÓN -->
+    <div class="descripcion" id="descripcion"></div>
+
+    <!-- POSTS -->
+    <div id="posts"></div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>Anotaciones</h3>
+    <textarea placeholder="Escribe notas, ideas, spoilers, etc..."></textarea>
+  </div>
+
+</div>
+
+<script>
+/* =====================
+   CONFIGURACIÓN
+===================== */
+const pagina = {
+  banner: "https://images.alphacoders.com/136/1366682.jpeg",
+  descripcion: {
+    titulo: "Seraph of the End",
+    texto: "Subreddit para fans del manga y anime Owari no Seraph."
+  },
+  posts: [
+    {
+      titulo: "Mi cosplay de Krul Tepes ><",
+      texto: "Espero que les guste 💖",
+      imagenes: [
+        { num: 1, page: "https://i.imgur.com/0KFBHTB.jpg" }
+      ]
+    },
+    {
+      titulo: "",
+      texto: "Post solo con texto, sin título.",
+      imagenes: []
+    },
+    {
+      titulo: "Solo imágenes",
+      texto: "",
+      imagenes: [
+        { num: 1, page: "https://backupter.wordpress.com/wp-content/uploads/2025/05/03-6.png" },
+        { num: 2, page: "" }
+      ]
+    },
+    {
+      titulo: "",
+      texto: "",
+      imagenes: []
+    }
+  ]
+};
+
+/* =====================
+   RENDER
+===================== */
+document.getElementById("banner").style.backgroundImage = `url(${pagina.banner})`;
+
+const desc = document.getElementById("descripcion");
+if (pagina.descripcion.titulo || pagina.descripcion.texto) {
+  desc.innerHTML = `
+    ${pagina.descripcion.titulo ? `<h2>${pagina.descripcion.titulo}</h2>` : ""}
+    ${pagina.descripcion.texto ? `<p>${pagina.descripcion.texto}</p>` : ""}
+  `;
+} else {
+  desc.style.display = "none";
+}
+
+const contenedorPosts = document.getElementById("posts");
+
+pagina.posts.forEach(post => {
+  if (!post.titulo && !post.texto && (!post.imagenes || post.imagenes.every(img => !img.page))) return;
+
+  const div = document.createElement("div");
+  div.className = "post";
+
+  let html = "";
+
+  if (post.titulo) html += `<h3>${post.titulo}</h3>`;
+  if (post.texto) html += `<p>${post.texto}</p>`;
+
+  if (post.imagenes && post.imagenes.length) {
+    const imgs = post.imagenes.filter(i => i.page);
+    if (imgs.length) {
+      html += `<div class="post-images">`;
+      imgs.forEach(img => {
+        html += `<img src="${img.page}" alt="Imagen ${img.num}">`;
+      });
+      html += `</div>`;
+    }
+  }
+
+  div.innerHTML = html;
+  contenedorPosts.appendChild(div);
+});
+</script>
+
+</body>
+</html>
