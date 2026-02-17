@@ -80,35 +80,26 @@ a { color: inherit; text-decoration: none; }
   background: #ff2f78;
 }
 
-/* NOTAS */
 .note {
   background:#0f0f0f;
   border:1px solid #222;
-  padding:18px 12px 12px 12px; /* espacio arriba para la X */
+  padding:10px;
   border-radius:6px;
   margin-top:10px;
   font-size:14px;
   position:relative;
-  line-height:1.5;
 }
 
 .note button {
   position:absolute;
-  top:8px;
-  right:8px;
+  top:6px;
+  right:6px;
   background:#333;
   border:none;
   color:#fff;
   padding:3px 6px;
   cursor:pointer;
   border-radius:4px;
-  font-size:12px;
-  opacity:0.8;
-}
-
-.note button:hover {
-  opacity:1;
-  background:#555;
 }
 
 .post {
@@ -222,16 +213,16 @@ pagina.posts.forEach(post=>{
 });
 
 async function cargarNotas(){
-  const res=await fetch(API);
+  const res=await fetch(API+"/list");
   const notas=await res.json();
   const cont=document.getElementById("notes");
   cont.innerHTML="";
-  notas.reverse().forEach((n,i)=>{
+  notas.reverse().forEach(n=>{
     const d=document.createElement("div");
     d.className="note";
     d.innerHTML=`
-      ${n}
-      <button onclick="borrarNota(${i})">X</button>
+      ${n.text}
+      <button onclick="borrarNota('${n.id}')">X</button>
     `;
     cont.appendChild(d);
   });
@@ -241,10 +232,9 @@ async function guardarNota(){
   const input=document.getElementById("noteInput");
   if(!input.value.trim())return;
 
-  await fetch(API,{
+  await fetch(API+"/save",{
     method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({texto:input.value})
+    body:JSON.stringify({text:input.value})
   });
 
   input.value="";
@@ -252,7 +242,7 @@ async function guardarNota(){
 }
 
 async function borrarNota(id){
-  await fetch(API+"?id="+id,{ method:"DELETE" });
+  await fetch(API+"/delete?id="+id);
   cargarNotas();
 }
 
