@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post estilo Reddit</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #0b0b0b;
+  color: #fff;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.banner {
+  width: 100%;
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 3px solid #d8175f;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  padding: 20px;
+}
+
+.descripcion {
+  background: #111;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.descripcion h2 {
+  color: #d8175f;
+  margin-top: 0;
+}
+
+.sidebar {
+  background: #111;
+  padding: 15px;
+  border-radius: 10px;
+  height: fit-content;
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  color: #00ff99;
+}
+
+.sidebar textarea {
+  width: 100%;
+  min-height: 120px;
+  background: #0b0b0b;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 10px;
+  resize: vertical;
+}
+
+.sidebar button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background: #d8175f;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sidebar button:hover {
+  background: #ff2f78;
+}
+
+.note {
+  background:#0f0f0f;
+  border:1px solid #222;
+  padding:10px;
+  border-radius:6px;
+  margin-top:10px;
+  font-size:14px;
+  position:relative;
+}
+
+.note button {
+  position:absolute;
+  top:6px;
+  right:6px;
+  background:#333;
+  border:none;
+  color:#fff;
+  padding:3px 6px;
+  cursor:pointer;
+  border-radius:4px;
+}
+
+.post {
+  background: #111;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.post h3 {
+  margin-top: 0;
+  color: #d8175f;
+}
+
+.post p {
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* ===== LINKS OPCIONALES ===== */
+.post-links {
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.post-links a {
+  display: inline-block;
+  margin-right: 12px;
+  margin-top: 6px;
+  font-weight: bold;
+  color: #EEE0F7;
+  text-decoration: none;
+}
+
+.post-links a:hover {
+  text-decoration: underline;
+  color: #ffffff;
+}
+
+.post-images img {
+  width: 100%;
+  margin-top: 15px;
+  border-radius: 10px;
+}
+
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="banner" id="banner"></div>
+
+<div class="main">
+
+  <div>
+    <div class="descripcion" id="descripcion"></div>
+    <div id="posts"></div>
+  </div>
+
+  <div class="sidebar">
+    <h3>Anotaciones</h3>
+    <textarea id="noteInput" placeholder="Escribe notas, ideas, spoilers, etc..."></textarea>
+    <button onclick="guardarNota()">Guardar nota</button>
+    <div id="notes"></div>
+  </div>
+
+</div>
+
+<script>
+const API = "https://anotaciones.jeff7gotosleep.workers.dev";
+
+const pagina = {
+  banner: "https://styles.redditmedia.com/t5_3267i/styles/bannerBackgroundImage_dbow3m72z9j21.jpg?format=pjpg&s=43eb358ff7e9be9c02b64c52eabad66af21cefc6",
+  descripcion: {
+    titulo: "Seraph of the End",
+    texto: "Subreddit para fans del manga y anime Owari no Seraph."
+  },
+  posts: [
+    {
+      titulo: "Song 1: Lookiney + Tenioha!",
+      texto: "Espero que les guste 💖",
+      TextUrl: ["Reddit", "YouTube"],
+      Url: ["https://reddit.com", "https://youtube.com"],
+      imagenes: [{ num:1,page:"https://i.imgur.com/0KFBHTB.jpg"}]
+    },
+    {
+      titulo:"",
+      texto:"Post solo con texto, sin título.",
+      TextUrl: [],
+      Url: [],
+      imagenes:[]
+    },
+    {
+      titulo:"Solo imágenes",
+      texto:"",
+      TextUrl: ["Fuente"],
+      Url: ["https://backupter.wordpress.com"],
+      imagenes:[
+        {num:1,page:"https://backupter.wordpress.com/wp-content/uploads/2025/05/03-6.png"}
+      ]
+    }
+  ]
+};
+
+document.getElementById("banner").style.backgroundImage=`url(${pagina.banner})`;
+
+const desc=document.getElementById("descripcion");
+desc.innerHTML=`
+<h2>${pagina.descripcion.titulo}</h2>
+<p>${pagina.descripcion.texto}</p>
+`;
+
+const contenedorPosts=document.getElementById("posts");
+
+pagina.posts.forEach(post=>{
+  if(!post.titulo && !post.texto && !post.imagenes.length && !(post.Url && post.Url.length)) return;
+
+  const div=document.createElement("div");
+  div.className="post";
+
+  let html="";
+  if(post.titulo) html+=`<h3>${post.titulo}</h3>`;
+  if(post.texto) html+=`<p>${post.texto}</p>`;
+
+  /* ===== LINKS OPCIONALES ===== */
+  if(post.Url && post.Url.length){
+    const links = post.Url.map((url,i)=>{
+      if(!url) return "";
+      const texto = post.TextUrl && post.TextUrl[i] ? post.TextUrl[i] : url;
+      return `<a href="${url}" target="_blank">${texto}</a>`;
+    }).join("");
+
+    if(links) html+=`<div class="post-links">${links}</div>`;
+  }
+
+  if(post.imagenes.length){
+    html+=`<div class="post-images">`;
+    post.imagenes.forEach(img=>{
+      if(img.page) html+=`<img src="${img.page}">`;
+    });
+    html+=`</div>`;
+  }
+
+  div.innerHTML=html;
+  contenedorPosts.appendChild(div);
+});
+
+async function cargarNotas(){
+  const res=await fetch(API+"/list");
+  const notas=await res.json();
+  const cont=document.getElementById("notes");
+  cont.innerHTML="";
+  notas.reverse().forEach(n=>{
+    const d=document.createElement("div");
+    d.className="note";
+    d.innerHTML=`
+      ${n.text}
+      <button onclick="borrarNota('${n.id}')">X</button>
+    `;
+    cont.appendChild(d);
+  });
+}
+
+async function guardarNota(){
+  const input=document.getElementById("noteInput");
+  if(!input.value.trim())return;
+
+  await fetch(API+"/save",{
+    method:"POST",
+    body:JSON.stringify({text:input.value})
+  });
+
+  input.value="";
+  cargarNotas();
+}
+
+async function borrarNota(id){
+  await fetch(API+"/delete?id="+id);
+  cargarNotas();
+}
+
+cargarNotas();
+</script>
+
+</body>
+</html>
