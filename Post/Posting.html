@@ -211,6 +211,8 @@ cont.innerHTML="";
 
 notas.reverse().forEach(n=>{
 
+if(!n || !n.text) return;
+
 const d=document.createElement("div");
 d.className="note";
 
@@ -222,7 +224,7 @@ d.innerHTML=`
 cont.appendChild(d);
 
 });
-
+  
 }catch(err){
 console.error(err);
 }
