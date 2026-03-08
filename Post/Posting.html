@@ -80,8 +80,6 @@ a{color:inherit;text-decoration:none;}
   background:#ff2f78;
 }
 
-/* NOTAS */
-
 .note{
   background:#0f0f0f;
   border:1px solid #222;
@@ -169,13 +167,11 @@ texto:"SubNotes para HK"
 posts:[
 {
 titulo:"Pass: 8/3/2026 - 14:47",
-texto:"9494",
-imagenes:[]
+texto:"9494"
 },
 {
 titulo:"",
-texto:"Haz llegado al final de la pagina",
-imagenes:[]
+texto:"Haz llegado al final de la pagina"
 }
 ]
 };
@@ -203,11 +199,9 @@ contenedorPosts.appendChild(div);
 });
 
 
-/* =======================
-CARGAR NOTAS
-======================= */
-
 async function cargarNotas(){
+
+try{
 
 const res=await fetch(API);
 const notas=await res.json();
@@ -229,12 +223,12 @@ cont.appendChild(d);
 
 });
 
+}catch(err){
+console.error(err);
 }
 
+}
 
-/* =======================
-GUARDAR NOTA
-======================= */
 
 async function guardarNota(){
 
@@ -255,16 +249,10 @@ cargarNotas();
 }
 
 
-/* =======================
-BORRAR NOTA (ARREGLADO)
-======================= */
-
 async function borrarNota(id){
 
-await fetch(API,{
-method:"DELETE",
-headers:{ "Content-Type":"application/json" },
-body:JSON.stringify({id:id})
+await fetch(API+"?id="+id,{
+method:"DELETE"
 });
 
 cargarNotas();
